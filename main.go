@@ -11,7 +11,7 @@ import (
 func main() {
 	config.Carregar()
 
-	fmt.Println("URL do banco:", config.StringConexaoBanco)
+	//fmt.Println("URL do banco:", config.StringConexaoBanco)
 
 	router := router.Gerar()
 
