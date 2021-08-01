@@ -4,38 +4,42 @@ import (
 	"devbook/src/database"
 	"devbook/src/models"
 	"devbook/src/repositories"
+	"devbook/src/respostas"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 // Cria usuário no banco de dados
 func CriarUsuario(rw http.ResponseWriter, r *http.Request) {
-	rw.Write([]byte("Criando usuário"))
 	corpoRequest, erro := ioutil.ReadAll(r.Body)
 	if erro != nil {
-		log.Fatal(erro)
+		respostas.Erro(rw, http.StatusUnprocessableEntity, erro)
+		return
 	}
 
 	user := models.Usuario{}
 
 	if erro = json.Unmarshal(corpoRequest, &user); erro != nil {
-		log.Fatal(erro)
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
 	}
 
 	db, erro := database.Conectar()
 	if erro != nil {
-		log.Fatal(erro)
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
 	}
 
+	defer db.Close()
+
 	repositoryUsuario := repositories.NovoRepositorioUsuario(db)
-	usuarioID, erro := repositoryUsuario.Criar(user)
+	user.ID, erro = repositoryUsuario.Criar(user)
 	if erro != nil {
-		log.Fatal(erro)
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
 	}
-	rw.Write([]byte(fmt.Sprintf("ID inserido: %d", usuarioID)))
+	respostas.JSON(rw, http.StatusCreated, user)
 }
 
 // Lista usuários no banco de dados
