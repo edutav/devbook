@@ -5,6 +5,7 @@ import (
 	"devbook/src/models"
 	"devbook/src/repositories"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,7 +31,11 @@ func CriarUsuario(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	repositoryUsuario := repositories.NovoRepositorioUsuario(db)
-	repositoryUsuario.Criar(user)
+	usuarioID, erro := repositoryUsuario.Criar(user)
+	if erro != nil {
+		log.Fatal(erro)
+	}
+	rw.Write([]byte(fmt.Sprintf("ID inserido: %d", usuarioID)))
 }
 
 // Lista usuários no banco de dados
