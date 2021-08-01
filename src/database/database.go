@@ -9,7 +9,7 @@ import (
 
 // Abre a conexão com o banco de dados e retorna
 func Conectar() (*sql.DB, error) {
-	db, erro := sql.Open("mysq", config.StringConexaoBanco)
+	db, erro := sql.Open("mysql", config.StringConexaoBanco)
 	if erro != nil {
 		return nil, erro
 	}
