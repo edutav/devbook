@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"devbook/src/models"
+	"fmt"
 )
 
 type UsuarioRepository struct {
@@ -33,4 +34,31 @@ func (ur UsuarioRepository) Criar(usuario models.Usuario) (uint64, error) {
 	}
 
 	return uint64(ultimoIdInserido), nil
+}
+
+// Buscar um usuário no banco baseado no filtro de nome ou nick
+func (ur UsuarioRepository) Buscar(nomeNick string) ([]models.Usuario, error) {
+	nomeNick = fmt.Sprintf("%%%s%%", nomeNick)
+
+	linhas, erro := ur.db.Query(
+		"select id, nome, nick, email, criadoEm from usuarios where nome LIKE ? or nick LIKE ?", nomeNick, nomeNick,
+	)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var users []models.Usuario
+
+	for linhas.Next() {
+		var user = models.Usuario{}
+
+		if erro = linhas.Scan(&user.ID, &user.Nome, &user.Nick, &user.Email, &user.CriadoEm); erro != nil {
+			return nil, erro
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
