@@ -8,6 +8,7 @@ import (
 
 // Retorna uma resposta em Json
 func JSON(rw http.ResponseWriter, statusCode int, dados interface{}) {
+	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(statusCode)
 	if erro := json.NewEncoder(rw).Encode(dados); erro != nil {
 		log.Fatal(erro)
