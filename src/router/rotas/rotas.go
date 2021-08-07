@@ -1,6 +1,7 @@
 package rotas
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,9 +18,11 @@ type Rota struct {
 // Coloca todas as rotas dentro no Router
 func Configurar(r *mux.Router) *mux.Router {
 	rotas := rotasUsuarios
+	rotas = append(rotas, rotaLogin)
 
 	for _, rota := range rotas {
 		r.HandleFunc(rota.Uri, rota.Funcao).Methods(rota.Metodo)
+		fmt.Println("Rota detectada ->", rota.Uri)
 	}
 
 	return r
