@@ -1,0 +1,13 @@
+package rotas
+
+import (
+	"devbook/src/controllers"
+	"net/http"
+)
+
+var rotaLogin = Rota{
+	Uri:                "/login",
+	Metodo:             http.MethodPost,
+	Funcao:             controllers.Login,
+	RequerAutenticacao: false,
+}
