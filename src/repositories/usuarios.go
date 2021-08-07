@@ -94,3 +94,17 @@ func (ur UsuarioRepository) Atualizar(id uint64, usuario models.Usuario) error {
 
 	return nil
 }
+
+func (ur UsuarioRepository) Deletar(id uint64) error {
+	statement, erro := ur.db.Prepare("delete from usuarios where id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(id); erro != nil {
+		return erro
+	}
+
+	return nil
+}
