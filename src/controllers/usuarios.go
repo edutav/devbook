@@ -29,7 +29,7 @@ func CriarUsuario(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro = user.Preparar(); erro != nil {
+	if erro = user.Preparar("cadastro"); erro != nil {
 		respostas.Erro(rw, http.StatusBadRequest, erro)
 		return
 	}
@@ -107,7 +107,45 @@ func BuscarUsuario(rw http.ResponseWriter, r *http.Request) {
 
 // Atualiza usuário no banco de dados
 func AtualizarUsuario(rw http.ResponseWriter, r *http.Request) {
-	rw.Write([]byte("Atualizando usuário"))
+	params := mux.Vars(r)
+
+	usuarioID, erro := strconv.ParseUint(params["id"], 10, 64)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuario := models.Usuario{}
+	if erro = json.Unmarshal(corpoRequest, &usuario); erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = usuario.Preparar("edição"); erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Conectar()
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositories.NovoRepositorioUsuario(db)
+	if erro = repositorio.Atualizar(usuarioID, usuario); erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(rw, http.StatusNoContent, nil)
 }
 
 // Deleta usuário no banco de dados
