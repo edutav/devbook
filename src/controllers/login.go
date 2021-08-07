@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"devbook/src/autenticacao"
 	"devbook/src/database"
 	"devbook/src/models"
 	"devbook/src/repositories"
 	"devbook/src/respostas"
 	"devbook/src/seguranca"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -45,5 +47,9 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respostas.JSON(rw, http.StatusOK, userSaved)
+	token, _ := autenticacao.CriarToken(userSaved.ID)
+	fmt.Println(token)
+	rw.Write([]byte(token))
+
+	//respostas.JSON(rw, http.StatusOK, userSaved)
 }
