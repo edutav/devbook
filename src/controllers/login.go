@@ -8,7 +8,6 @@ import (
 	"devbook/src/respostas"
 	"devbook/src/seguranca"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -47,8 +46,11 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, _ := autenticacao.CriarToken(userSaved.ID)
-	fmt.Println(token)
+	token, erro := autenticacao.CriarToken(userSaved.ID)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
 	rw.Write([]byte(token))
 
 	//respostas.JSON(rw, http.StatusOK, userSaved)
