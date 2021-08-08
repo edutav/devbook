@@ -15,6 +15,6 @@ func main() {
 
 	router := router.Gerar()
 
-	fmt.Println("Executando API na porta", config.Porta)
+	fmt.Printf("\n Executando API na porta %d", config.Porta)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), router))
 }
