@@ -178,7 +178,7 @@ func DeletarUsuario(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if usuarioIDToken != usuarioID {
-		respostas.Erro(rw, http.StatusForbidden, errors.New("não é possivel atualizar um usuário que não seja o seu"))
+		respostas.Erro(rw, http.StatusForbidden, errors.New("não é possivel deletar um usuário que não seja o seu"))
 		return
 	}
 
