@@ -19,7 +19,6 @@ func CriarToken(usuarioID uint64) (string, error) {
 	permissoes["usuarioId"] = usuarioID
 	// secret
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissoes)
-
 	return token.SignedString([]byte(config.SecretKey))
 }
 
@@ -35,10 +34,10 @@ func ValidarToken(r *http.Request) error {
 		return nil
 	}
 
-	return errors.New("token invalido")
+	return errors.New("token inválido")
 }
 
-func ExtrarUsuarioID(r *http.Request) (uint64, error) {
+func ExtrairUsuarioID(r *http.Request) (uint64, error) {
 	tokenString := extrairToken(r)
 	token, erro := jwt.Parse(tokenString, retornarChaveVerificacao)
 
@@ -55,7 +54,7 @@ func ExtrarUsuarioID(r *http.Request) (uint64, error) {
 		return usuarioID, nil
 	}
 
-	return 0, errors.New("token invalido")
+	return 0, errors.New("token inválido")
 }
 
 func extrairToken(r *http.Request) string {
