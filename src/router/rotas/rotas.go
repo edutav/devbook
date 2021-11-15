@@ -22,12 +22,9 @@ func Configurar(r *mux.Router) *mux.Router {
 	rotas = append(rotas, rotaLogin)
 
 	for _, rota := range rotas {
-		fmt.Printf("\n Rota detectada -> %s : Método -> %s", rota.Uri, rota.Metodo)
+		fmt.Printf("\nRota detectada -> %s : Método -> %s", rota.Uri, rota.Metodo)
 		if rota.RequerAutenticacao {
-			r.HandleFunc(
-				rota.Uri,
-				middlewares.Logger(middlewares.Autenticar(rota.Funcao)),
-			).Methods(rota.Metodo)
+			r.HandleFunc(rota.Uri, middlewares.Logger(middlewares.Autenticar(rota.Funcao))).Methods(rota.Metodo)
 		} else {
 			r.HandleFunc(rota.Uri, middlewares.Logger(rota.Funcao)).Methods(rota.Metodo)
 		}
