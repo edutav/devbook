@@ -6,17 +6,17 @@ import (
 	"fmt"
 )
 
-type UsuarioRepository struct {
+type usuarioRepository struct {
 	db *sql.DB
 }
 
 //Cria um repositotório de usuários
-func NovoRepositorioUsuario(db *sql.DB) *UsuarioRepository {
-	return &UsuarioRepository{db}
+func NovoRepositorioUsuario(db *sql.DB) *usuarioRepository {
+	return &usuarioRepository{db}
 }
 
 // Insise um usuário no banco
-func (ur UsuarioRepository) Criar(usuario models.Usuario) (uint64, error) {
+func (ur usuarioRepository) Criar(usuario models.Usuario) (uint64, error) {
 	statement, erro := ur.db.Prepare("insert into usuarios(nome, nick, email, senha) values(?, ?, ?, ?)")
 	if erro != nil {
 		return 0, erro
@@ -37,7 +37,7 @@ func (ur UsuarioRepository) Criar(usuario models.Usuario) (uint64, error) {
 }
 
 // Buscar um usuário no banco baseado no filtro de nome ou nick
-func (ur UsuarioRepository) Buscar(nomeNick string) ([]models.Usuario, error) {
+func (ur usuarioRepository) Buscar(nomeNick string) ([]models.Usuario, error) {
 	nomeNick = fmt.Sprintf("%%%s%%", nomeNick)
 
 	linhas, erro := ur.db.Query(
@@ -63,7 +63,7 @@ func (ur UsuarioRepository) Buscar(nomeNick string) ([]models.Usuario, error) {
 	return users, nil
 }
 
-func (ur UsuarioRepository) BuscarPorId(id uint64) (models.Usuario, error) {
+func (ur usuarioRepository) BuscarPorId(id uint64) (models.Usuario, error) {
 	linha, erro := ur.db.Query("select id, nome, nick, email, criadoEm from usuarios where id = ?", id)
 	if erro != nil {
 		return models.Usuario{}, erro
@@ -81,7 +81,7 @@ func (ur UsuarioRepository) BuscarPorId(id uint64) (models.Usuario, error) {
 	return user, nil
 }
 
-func (ur UsuarioRepository) Atualizar(id uint64, usuario models.Usuario) error {
+func (ur usuarioRepository) Atualizar(id uint64, usuario models.Usuario) error {
 	statement, erro := ur.db.Prepare("update usuarios set nome = ?, nick = ?, email = ? where id = ?")
 	if erro != nil {
 		return erro
@@ -95,7 +95,7 @@ func (ur UsuarioRepository) Atualizar(id uint64, usuario models.Usuario) error {
 	return nil
 }
 
-func (ur UsuarioRepository) Deletar(id uint64) error {
+func (ur usuarioRepository) Deletar(id uint64) error {
 	statement, erro := ur.db.Prepare("delete from usuarios where id = ?")
 	if erro != nil {
 		return erro
@@ -109,7 +109,7 @@ func (ur UsuarioRepository) Deletar(id uint64) error {
 	return nil
 }
 
-func (ur UsuarioRepository) BuscarPorEmail(email string) (models.Usuario, error) {
+func (ur usuarioRepository) BuscarPorEmail(email string) (models.Usuario, error) {
 	linha, erro := ur.db.Query("select id, senha from usuarios where email = ?", email)
 	if erro != nil {
 		return models.Usuario{}, erro
