@@ -16,7 +16,7 @@
 
 * Twitter: [@edutav](https://twitter.com/edutav)
 * Github: [@edutav](https://github.com/edutav)
-* LinkedIn: [@https:\/\/www.linkedin.com\/in\/edutav](https://linkedin.com/in/https:\/\/www.linkedin.com\/in\/edutav)
+* LinkedIn: [@edutav](https://linkedin.com/in/https:\/\/www.linkedin.com\/in\/edutav)
 
 ## 🤝 Contributing
 
