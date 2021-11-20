@@ -34,26 +34,37 @@ func Carregar() {
 		Porta = 8181
 	}
 
-	StringConexaoBanco = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
-		os.Getenv("DB_USUARIO"), os.Getenv("DB_SENHA"), os.Getenv("DB_NOME"),
-	)
+	StringConexaoBanco = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USUARIO"), os.Getenv("DB_SENHA"), os.Getenv("BD_HOST"), os.Getenv("BD_PORT"), os.Getenv("DB_NOME"))
 
 	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
 
 func setEnvVariable() {
+	mapValues := make(map[string]string)
+
 	chave := make([]byte, 64)
 
-	if _, erro := godotenv.Read(".env"); erro != nil {
-		if _, erro := rand.Read(chave); erro != nil {
-			log.Fatal(erro)
-		}
+	if _, erro := rand.Read(chave); erro != nil {
+		log.Fatal(erro)
+	}
 
-		mapValues := make(map[string]string)
+	stringBase64 := base64.StdEncoding.EncodeToString(chave)
 
-		stringBase64 := base64.StdEncoding.EncodeToString(chave)
+	if erro := godotenv.Load(".env"); erro != nil {
+		log.Fatal(erro)
+	}
 
+	values, erro := godotenv.Read(".env")
+	if erro != nil {
 		scanner := bufio.NewScanner(os.Stdin)
+
+		fmt.Print("Informar URL do banco de dados: ")
+		scanner.Scan()
+		mapValues["BD_HOST"] = scanner.Text()
+
+		fmt.Print("Informar porta do banco de dados: ")
+		scanner.Scan()
+		mapValues["BD_PORT"] = scanner.Text()
 
 		fmt.Print("Informar usuário do banco de dados: ")
 		scanner.Scan()
@@ -72,12 +83,21 @@ func setEnvVariable() {
 		mapValues["API_PORTA"] = scanner.Text()
 
 		mapValues["SECRET_KEY"] = stringBase64
+	} else if len(values) == 0 {
+		mapValues["BD_HOST"] = os.Getenv("BD_HOST")
+		mapValues["BD_PORT"] = os.Getenv("BD_PORT")
+		mapValues["DB_USUARIO"] = os.Getenv("DB_USUARIO")
+		mapValues["DB_SENHA"] = os.Getenv("DB_SENHA")
+		mapValues["DB_NOME"] = os.Getenv("DB_NOME")
+		mapValues["API_PORTA"] = os.Getenv("API_PORTA")
+		mapValues["SECRET_KEY"] = stringBase64
+	}
 
+	if len(mapValues) > 0 {
 		newDir, err := os.Getwd()
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		godotenv.Write(mapValues, newDir+"/.env")
 	}
 }
