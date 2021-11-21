@@ -50,10 +50,6 @@ func setEnvVariable() {
 
 	stringBase64 := base64.StdEncoding.EncodeToString(chave)
 
-	if erro := godotenv.Load(".env"); erro != nil {
-		log.Fatal(erro)
-	}
-
 	values, erro := godotenv.Read(".env")
 	if erro != nil {
 		scanner := bufio.NewScanner(os.Stdin)
