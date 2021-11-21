@@ -34,7 +34,7 @@ func Carregar() {
 		Porta = 8181
 	}
 
-	StringConexaoBanco = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USUARIO"), os.Getenv("DB_SENHA"), os.Getenv("BD_HOST"), os.Getenv("BD_PORT"), os.Getenv("DB_NOME"))
+	StringConexaoBanco = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", os.Getenv("DB_USUARIO"), os.Getenv("DB_SENHA"), os.Getenv("BD_HOST"), os.Getenv("BD_PORT"), os.Getenv("DB_NOME"))
 
 	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
