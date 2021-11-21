@@ -16,7 +16,7 @@ var (
 	StringConexaoBanco = ""
 	Porta              = 0
 	SecretKey          []byte
-	Version            = "0.0.1"
+	Version            = "0.0.2"
 )
 
 // Inicializar as variaveis de ambiente
