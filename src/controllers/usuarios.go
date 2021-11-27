@@ -274,3 +274,30 @@ func PararDeSeguirUsuario(rw http.ResponseWriter, r *http.Request) {
 
 	respostas.JSON(rw, http.StatusNoContent, nil)
 }
+
+// Busca seguidores de um usuário
+func BuscarSeguidores(rw http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(params["id"], 10, 64)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Conectar()
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositories.NovoRepositorioUsuario(db)
+	seguidores, erro := repositorio.BuscarSeguidores(usuarioID)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(rw, http.StatusOK, seguidores)
+
+}
