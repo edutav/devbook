@@ -202,7 +202,8 @@ func DeletarUsuario(rw http.ResponseWriter, r *http.Request) {
 
 // Permite que um usuário siga o outro
 func SeguirUsuario(rw http.ResponseWriter, r *http.Request) {
-	usuarioID, erro := autenticacao.ExtrairUsuarioID(r)
+	seguidorID, erro := autenticacao.ExtrairUsuarioID(r)
+
 	if erro != nil {
 		respostas.Erro(rw, http.StatusUnauthorized, erro)
 		return
@@ -210,7 +211,7 @@ func SeguirUsuario(rw http.ResponseWriter, r *http.Request) {
 
 	parametros := mux.Vars(r)
 
-	seguidorID, erro := strconv.ParseUint(parametros["id"], 10, 64)
+	usuarioID, erro := strconv.ParseUint(parametros["id"], 10, 64)
 	if erro != nil {
 		respostas.Erro(rw, http.StatusBadRequest, erro)
 		return
