@@ -6,6 +6,7 @@ import (
 	"devbook/src/models"
 	"devbook/src/repositories"
 	"devbook/src/respostas"
+	"devbook/src/seguranca"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -327,4 +328,70 @@ func BuscarSeguindo(rw http.ResponseWriter, r *http.Request) {
 
 	respostas.JSON(rw, http.StatusOK, seguidores)
 
+}
+
+func AtualizarSenha(rw http.ResponseWriter, r *http.Request) {
+	usuarioIDToken, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusUnauthorized, erro)
+		return
+	}
+
+	params := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(params["id"], 10, 64)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	if usuarioIDToken != usuarioID {
+		respostas.Erro(rw, http.StatusForbidden, errors.New(
+			"não é possivel atualizar a senha de um usuário que não seja o seu"),
+		)
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	var senha models.Senha
+	if erro = json.Unmarshal(corpoRequest, &senha); erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Conectar()
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositories.NovoRepositorioUsuario(db)
+	senhaSalva, erro := repositorio.BuscarSenha(usuarioID)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+
+	if erro = seguranca.VerificarSenha(senhaSalva, senha.Atual); erro != nil {
+		respostas.Erro(rw, http.StatusUnauthorized, errors.New("a senha atual não condiz com a senha salva no banco"))
+		return
+	}
+
+	senhaComHash, erro := seguranca.Hash(senha.Nova)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = repositorio.AtualizarSenha(usuarioID, string(senhaComHash)); erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(rw, http.StatusNoContent, nil)
 }
