@@ -202,3 +202,37 @@ func (ur usuarioRepository) BuscarSeguindo(usuarioID uint64) ([]models.Usuario, 
 
 	return users, nil
 }
+
+// buscar senha por ai na base
+func (ur usuarioRepository) BuscarSenha(id uint64) (string, error) {
+	linha, erro := ur.db.Query("select senha from usuarios where id = ?", id)
+	if erro != nil {
+		return "", erro
+	}
+	defer linha.Close()
+
+	user := models.Usuario{}
+
+	if linha.Next() {
+		if erro = linha.Scan(&user.Senha); erro != nil {
+			return "", erro
+		}
+	}
+
+	return user.Senha, nil
+}
+
+// Altera a senha de um usuário
+func (ur usuarioRepository) AtualizarSenha(id uint64, senhaComHash string) error {
+	statement, erro := ur.db.Prepare("update usuarios set senha = ? where id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(senhaComHash, id); erro != nil {
+		return erro
+	}
+
+	return nil
+}
