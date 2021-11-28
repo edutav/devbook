@@ -301,3 +301,30 @@ func BuscarSeguidores(rw http.ResponseWriter, r *http.Request) {
 	respostas.JSON(rw, http.StatusOK, seguidores)
 
 }
+
+// Busca seguidores do usuário
+func BuscarSeguindo(rw http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	usuarioID, erro := strconv.ParseUint(params["id"], 10, 64)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := database.Conectar()
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositories.NovoRepositorioUsuario(db)
+	seguidores, erro := repositorio.BuscarSeguindo(usuarioID)
+	if erro != nil {
+		respostas.Erro(rw, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(rw, http.StatusOK, seguidores)
+
+}
