@@ -179,3 +179,26 @@ func (ur usuarioRepository) BuscarSeguidores(usuarioID uint64) ([]models.Usuario
 
 	return users, nil
 }
+
+// Busca todos os usuários na base
+func (ur usuarioRepository) BuscarSeguindo(usuarioID uint64) ([]models.Usuario, error) {
+	linhas, erro := ur.db.Query(`select u.id, u.nome, u.nick, u.email, u.criadoEm from usuarios u inner join seguidores s on u.id = s.usuario_id where s.seguidor_id = ?`, usuarioID)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var users []models.Usuario
+
+	for linhas.Next() {
+		var user = models.Usuario{}
+
+		if erro = linhas.Scan(&user.ID, &user.Nome, &user.Nick, &user.Email, &user.CriadoEm); erro != nil {
+			return nil, erro
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
